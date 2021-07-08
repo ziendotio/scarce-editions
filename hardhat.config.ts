@@ -1,3 +1,6 @@
+// ethers plugin required to interact with the contract
+require('@nomiclabs/hardhat-ethers');
+
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-solhint';
 import 'solidity-coverage';
@@ -11,6 +14,9 @@ import { HardhatUserConfig } from 'hardhat/types';
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
+
+// private key from the pre-funded Beresheet testing account
+const { privateKey } = require('./private.json');
 
 const config: HardhatUserConfig = {
 	abiExporter: {
@@ -29,6 +35,14 @@ const config: HardhatUserConfig = {
 			},
 		},
 	},
+	networks: {
+		// Beresheet network specification
+		Beresheet: {
+		  url: `https://beresheet2.edgewa.re/evm`,
+		  chainId: 2022,
+		  accounts: [privateKey]
+		}
+	  }
 };
 
 export default config;

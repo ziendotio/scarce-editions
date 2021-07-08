@@ -36,4 +36,5 @@ ScarceEdition.abi
 # Coverage
 coverage.json
 
-
+# Network
+private.json
