@@ -1,5 +1,11 @@
 // scripts/deploy.js
 async function main() {
+  // Deployer
+  const [deployer] = await ethers.getSigners();
+  console.log("Deploying contracts with the account:", deployer.address);
+  console.log("Account balance:", (await deployer.getBalance()).toString());
+
+
   // We get the contract to deploy
   const ScarceEdition = await ethers.getContractFactory('ScarceEdition');
   console.log('Deploying ScarceEdition...');
