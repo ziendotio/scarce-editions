@@ -1,0 +1,43 @@
+{
+  "name": "scarce-editions",
+  "version": "1.0.0",
+  "description": "Scarce Editions are NFTs with a license and instructions to produce a physical artwork",
+  "keywords": [
+    "ethereum",
+    "erc721",
+    "solidity",
+    "smart",
+    "contract",
+    "blockchain"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joinzien/scarce-editions.git"
+  },
+  "homepage": "https://github.com/joinzien/scarce-editions",
+  "author": "zien <hello@zien.io>",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.4.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-solhint": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@types/chai": "^4.2.18",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.12.2",
+    "chai": "^4.3.4",
+    "ethereum-waffle": "^3.3.0",
+    "ethers": "^5.4.1",
+    "hardhat": "^2.4.1",
+    "hardhat-abi-exporter": "^2.2.1",
+    "hardhat-gas-reporter": "^1.0.4",
+    "solidity-coverage": "^0.7.16",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.3"
+  }
+}
