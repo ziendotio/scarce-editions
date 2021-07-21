@@ -52,8 +52,8 @@ const config: HardhatUserConfig = {
 			url: `https://mainnet.infura.io/v3/${ALCHEMY_API_KEY}`, // or any other JSON-RPC provider // <INFURA_API_KEY>
 			accounts: [MAINNET_PRIVATE_KEY]
 		},
-		// EDG Mainnet network specification // npx hardhat run scripts/deploy.js --network EdgMainnet
-		EdgMainnet: {
+		// EDG Mainnet network specification // npx hardhat run scripts/deploy.js --network EDGMainnet
+		EDGMainnet: {
 			// RPC URL: https://mainnet2.edgewa.re/evm
 			// RPC URL: https://mainnetX.edgewa.re/evm where X can be any number from 1 to 20
 			url: `https://mainnet2.edgewa.re/evm`,
