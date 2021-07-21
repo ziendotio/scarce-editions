@@ -38,21 +38,24 @@ const config: HardhatUserConfig = {
 	networks: {
 		// Beresheet network specification // npx hardhat run scripts/deploy.js --network beresheet
 		Beresheet: {
-		  url: `https://beresheet2.edgewa.re/evm`,
-		  chainId: 2022,
-		  accounts: [BERESHEET_PRIVATE_KEY]
+			url: `https://beresheet2.edgewa.re/evm`,
+			chainId: 2022,
+			accounts: [BERESHEET_PRIVATE_KEY]
 		},
 		// Ropsten network specification // npx hardhat run scripts/deploy.js --network ropsten
 		ropsten: {
 			url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
 			accounts: [`0x${ROPSTEN_PRIVATE_KEY}`],
-		  },
+		},
 		// Mainnet network specification // npx hardhat run scripts/deploy.js --network mainnet
 		mainnet: {
 			url: `https://mainnet.infura.io/v3/${ALCHEMY_API_KEY}`, // or any other JSON-RPC provider // <INFURA_API_KEY>
 			accounts: [MAINNET_PRIVATE_KEY]
-		} 
-	  },
+		},
+		EdgMainnet: {
+			
+		}
+	},
 };
 
 export default config;
