@@ -16,7 +16,7 @@ import { HardhatUserConfig } from 'hardhat/types';
 // Go to https://hardhat.org/config/ to learn more
 
 // private key from the pre-funded Beresheet testing account
-const { INFURA_API_KEY, ALCHEMY_API_KEY, BERESHEET_PRIVATE_KEY, ROPSTEN_PRIVATE_KEY, MAINNET_PRIVATE_KEY, EDGEWARE_MAIN_PRIVATE_KEY } = require('./private.json');
+const { INFURA_API_KEY, ALCHEMY_API_KEY, BERESHEET_PRIVATE_KEY, ROPSTEN_PRIVATE_KEY, MAINNET_PRIVATE_KEY, EDGEWARE_MAIN_PRIVATE_KEY, POLKADOT_MNEMONIC, POLKADOT_PRIVATE_KEY } = require('./private.json');
 
 const config: HardhatUserConfig = {
 	abiExporter: {
@@ -36,30 +36,10 @@ const config: HardhatUserConfig = {
 		},
 	},
 	networks: {
-		// Beresheet network specification // npx hardhat run scripts/deploy.js --network beresheet
-		Beresheet: {
-			url: `https://beresheet2.edgewa.re/evm`,
-			chainId: 2022,
-			accounts: [BERESHEET_PRIVATE_KEY]
-		},
-		// Ropsten network specification // npx hardhat run scripts/deploy.js --network ropsten
-		ropsten: {
-			url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-			accounts: [`0x${ROPSTEN_PRIVATE_KEY}`],
-		},
-		// Eth-Mainnet network specification // npx hardhat run scripts/deploy.js --network mainnet
-		mainnet: {
-			url: `https://mainnet.infura.io/v3/${ALCHEMY_API_KEY}`, // or any other JSON-RPC provider // <INFURA_API_KEY>
-			accounts: [MAINNET_PRIVATE_KEY]
-		},
-		// EDG Mainnet network specification // npx hardhat run scripts/deploy.js --network EDGMainnet
 		EDGMainnet: {
-			// RPC URL: https://mainnet2.edgewa.re/evm
-			// RPC URL: https://mainnetX.edgewa.re/evm where X can be any number from 1 to 20
 			url: `https://mainnet2.edgewa.re/evm`,
 			chainId: 2021,
-			accounts: [EDGEWARE_MAIN_PRIVATE_KEY],
-
+			accounts: [POLKADOT_PRIVATE_KEY],
 		}
 	},
 };

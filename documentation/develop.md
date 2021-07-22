@@ -31,8 +31,16 @@ This will install all the required packages to develop using the Scarce Editions
 
 Run the tests
 
-    npx hardhat test
+    npx hardhat test --network localhost
 
-[adrs]: architecture/decisions/
-[npm]: https://docs.npmjs.com/getting-started/installing-node
-[nvm]: https://github.com/nvm-sh/nvm
+This will run the test against a edgeware mainnet fork using your own metamask test accounts. 
+
+### Deployment
+
+Update the private.json file with your own EVM private key, which should hold enough EDG to perform the deployment successfully. 
+
+Run the deployment script :
+
+    npx hardhat run --network EDGMainnet scripts/deploy.js
+
+
