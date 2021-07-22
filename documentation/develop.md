@@ -37,7 +37,11 @@ This will run the test against a edgeware mainnet fork using your own metamask t
 
 ### Deployment
 
-Update the private.json file with your own EVM private key, which should hold enough EDG to perform the deployment successfully. 
+1. Acquire EDG tokens through an exchange and transfer your funds to metamask. ( Should you need to use polkadot.js/extension wallet in the process, you can convert your metamask EVM account address to a Polkadot address using this [helper tool](https://edgewa.re/keygen) in order to perform a [token transfer](https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Fmainnet.edgewa.re#/accounts) from your polkadot account to metamask )
+
+2. Update the private.json file with your own EVM private key (from metamask?), which should hold enough EDG to perform the deployment successfully.
+
+3. Set the hardhat configuration file to use the latest Edgeware load balancer: 
 
 Run the deployment script :
 
