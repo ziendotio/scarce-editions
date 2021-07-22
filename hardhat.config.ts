@@ -16,7 +16,7 @@ import { HardhatUserConfig } from 'hardhat/types';
 // Go to https://hardhat.org/config/ to learn more
 
 // private key from the pre-funded Beresheet testing account
-const { INFURA_API_KEY, ALCHEMY_API_KEY, BERESHEET_PRIVATE_KEY, ROPSTEN_PRIVATE_KEY, MAINNET_PRIVATE_KEY, EDGEWARE_MAIN_PRIVATE_KEY, POLKADOT_MNEMONIC, POLKADOT_PRIVATE_KEY } = require('./private.json');
+const { PRIVATE_KEY_ROLE_OBJ, POLKADOT_MNEMONIC, POLKADOT_PRIVATE_KEY } = require('./private.json');
 
 const config: HardhatUserConfig = {
 	abiExporter: {
@@ -36,8 +36,19 @@ const config: HardhatUserConfig = {
 		},
 	},
 	networks: {
+		hardhat: {
+			// npx hardhat node --fork https://mainnet2.edgewa.re/evm
+			// npx hardhat run --network localhost scripts/deploy.js
+			// npx hardhat test --network localhost 
+			forking: { 
+				url: `https://mainnet2.edgewa.re/evm`,
+			},
+			// Account to provide node with
+			accounts: PRIVATE_KEY_ROLE_OBJ,
+		},
 		EDGMainnet: {
-			url: `https://mainnet2.edgewa.re/evm`,
+			// https://mainnet.edgewa.re/evm
+			url: `https://mainnet.edgewa.re/evm`,
 			chainId: 2021,
 			accounts: [POLKADOT_PRIVATE_KEY],
 		}
