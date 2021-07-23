@@ -60,7 +60,7 @@ const config: HardhatUserConfig = {
 			url: `https://mainnet12.edgewa.re/evm`,
 			chainId: 2021,
 			accounts: [ACCOUNT_PRIVATE_KEY],
-			timeout: 6000000,
+			// timeout: 6000000,
 		},
 	},
 };
