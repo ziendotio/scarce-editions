@@ -38,3 +38,6 @@ coverage.json
 
 # Network
 private.json
+
+# Remix
+remix.js

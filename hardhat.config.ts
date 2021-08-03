@@ -16,7 +16,7 @@ import { HardhatUserConfig } from 'hardhat/types';
 // Go to https://hardhat.org/config/ to learn more
 
 // private key from the pre-funded Beresheet testing account
-const { PRIVATE_KEY_ROLE_OBJ, ACCOUNT_PRIVATE_KEY } = require('./private.json');
+const { PRIVATE_KEY_ROLE_OBJ, MAINNET_PRIVATE_KEY, TESTNET_PRIVATE_KEY } = require('./private.json');
 
 const config: HardhatUserConfig = {
 	abiExporter: {
@@ -51,16 +51,16 @@ const config: HardhatUserConfig = {
 		Beresheet: { // npx hardhat run --network Beresheet scripts/deploy.js
 			url: `https://beresheet2.edgewa.re/evm`,
 			chainId: 2022,
-			accounts: [ACCOUNT_PRIVATE_KEY],
+			accounts: [TESTNET_PRIVATE_KEY],
 		},
 		// Mainnet network specification
-		EDGMainnet: {
-			// Commands // npx hardhat run --network EDGMainnet scripts/deploy.js
+		Edgeware: {
+			// Commands // npx hardhat run --network Edgeware scripts/deploy.js
 			// HardhatConfigObject // https://hardhat.org/config/#json-rpc-based-networks
-			url: `https://mainnet12.edgewa.re/evm`,
+			url: `https://mainnet.edgewa.re/evm`,
 			chainId: 2021,
-			accounts: [ACCOUNT_PRIVATE_KEY],
-			// timeout: 6000000,
+			accounts: [MAINNET_PRIVATE_KEY],
+			gas: 1800,
 		},
 	},
 };
