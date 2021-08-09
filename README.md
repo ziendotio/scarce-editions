@@ -33,13 +33,14 @@ Hardhat offers great deployment features to test your smart contract! Amongst ot
 
 - the Hardhat default Network - run your tests using the default Hardhat Network, where you can use Hardhat default configuration, either in-process or stand-alone daemon, servicing JSON-RPC and WebSocket requests.
 - A blockchain fork - Where a solution of your choice will be run locally, ie copy the state of the net blockchain into your local environment, including all balances and deployed contracts.
-- A JSON-RPC Network, ie any TestNet or Mainnet.
+- A live JSON-RPC Network, ie any TestNet or Mainnet.
 
 The below will quickly lay out a few considerations for testing and deploying the scarce editions contract(s).
 
 In order to deploy to live nets you will most probably need:
 
 - A `private.json` file to store your wallet account(s) keys
+- A compiled smart contract. Run `npx hardhat compile`
 - Metamask account(s) with Tokens ( real or tap - please search for the recommended infrastructure solution)
 - Details of the Node to target
 
@@ -49,7 +50,7 @@ Test your smart contract with the `npx hardhat test` command.
 
 #### Local Node
 
-The following command will start Hardhat Network, and expose it as a JSON-RPC and WebSocket server.
+The following command will start Hardhat Network, and expose it as a JSON-RPC and WebSocket server (on top of Hardhat Network).
 
 `npx hardhat node`
 
@@ -78,18 +79,19 @@ networks: {
   hardhat: {
     forking: {
       url: "TARGETURL<key>";
+      blockNumber: BLOCKNUMBER
     }
   }
 }
 ```
 
-(Note that you'll need to replace the <key> component of the URL with your personal Alchemy API key.)
+(Note that you'll need to replace the <key> component of the URL with your personal Alchemy API key. You can optionally pin a block number to increase performance of your tests.)
 
 Alternatively, using hardhat default configuration, you can use flags to achieve the same result:
 
 The following command will spawn your local server, fetch the blockchain data and embedded its state and behavior locally.
 
-    ```npx hardhat node --fork https://mainnet2.edgewa.re/evm```
+    ```npx hardhat node --fork <url> --fork-block-number <block>```
 
 Either ways, you can now hit the localhost environment to run deployment and tests.
 
@@ -98,7 +100,7 @@ Either ways, you can now hit the localhost environment to run deployment and tes
 
 Note: In general, to run the test against a specific endpoint, run the command
 
-`npx hardhat test --network TARGETNETWORK`
+`npx hardhat test --network <name>`
 
 #### TestNet / Mainnet:
 
@@ -111,24 +113,37 @@ Note: In general, to run the test against a specific endpoint, run the command
 - Configure `hardhat.config.ts` file to your needs. Example:
 
 ```
-YOURNETWORK: { // npx hardhat run --network Beresheet scripts/deploy.js
-    url: "", // TARGET NODE URL
-    chainId: "", // TARGET CHAIN ID -- SECURITY MEASURE
-    accounts: [TESTNET_PRIVATE_KEY], // FROM PRIVATE.JSON
-    .. Additional as per [hardhat config]()
+/**
+* url : The target node
+* chainId: Id of the target blockchain (security measure)
+* accounts: Account private key, from private.json
+*/
+
+TARGETNETWORK: {
+    url: "",
+    chainId: "",
+    accounts: [ACCOUNT_PRIVATE_KEY],
 }
 ```
+
+Note: .. Additional properties as per [hardhat config](https://hardhat.org/hardhat-network/reference/)
 
 - To deploy the contract, run the command
 
 ```
-npx hardhat run --network TARGETNETWORK scripts/deploy.js
+npx hardhat run --network <name> scripts/deploy.js
 ```
 
 - To test the contract, run the command
 
 ```
-npx hardhat test --network TARGETNETWORK
+npx hardhat test --network <name>
 ```
 
 Please note, on a live chain, this will consume tokens for each test transaction, and test performance will be lower due to network and block operations.
+
+#### Deploy Flag
+
+Although using the script may help automate deployment tasks, the hardhat config file allows you to specify accounts to use for deployment, which will be used when running the deploy command:
+
+`npx hardhat deploy --network <name>`
