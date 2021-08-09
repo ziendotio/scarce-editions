@@ -39,10 +39,11 @@ The below will quickly lay out a few considerations for testing and deploying th
 
 In order to deploy to live nets you will most probably need:
 
-- A `private.json` file to store your wallet account(s) keys
+- A `private.json` file to store your wallet account(s) keys.
 - A compiled smart contract. Run `npx hardhat compile`
-- Metamask account(s) with Tokens ( real or tap - please search for the recommended infrastructure solution)
-- Details of the Node to target
+- Metamask account(s) with Tokens ( real or tap - please search for the recommended infrastructure solution).
+- Details of the Node to target.
+- An Etherium API key (Infura, Alchemy, etc..) for mainnet deployment.
 
 #### Default Hardhat Network
 
