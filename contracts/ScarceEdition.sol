@@ -157,10 +157,11 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
      * @param _operator -The address of the third party that acts on behalf of the owner.
      */
 
-    function reCreateState() external {
+    function createState() external {
 
         // get NTFs state
         ntfsAmount = prevVersion.totalSupply();  
+        console.log("PREV total supply: ", ntfsAmount)
 
         // If no NTF bearer
         if ( ntfsAmount == 0 ) return true;
@@ -169,10 +170,10 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
         for (uint256 i = 0; i < batchSize; i++) {
 
             // read metadata from nft
-            prevNTFuri = _prevVersion.
+            prevNTFuri = _prevVersion//get URI of token
 
             // replicate token
-            safeReCreate = create( _owner, tokenId[i], string memory uri);
+            safeReCreate = create( _owner, tokenId[i], string memory prevNTFuri );
 
             if ( safeReCreate ) {
                 // delete the contract
@@ -194,20 +195,26 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
 
         // set reference hook to previous version 
         _prevVersion = prevVersion;
+        console.log("PREV: ", _prevVersion);
 
-        // set previous version reference hook to next version
+        // set previous version reference hook to this version
         _prevVersion._nextVersion = address(this);
+        console.log("PREV pointer: ", _prevVersion._nextVersion);
 
         // Old contract set to not allow new NFTs to be created
         _prevVersion.pause();
+        console.log("PREV paused", _prevVersion.paused());
 
         // User authorise upgrade contract to control the asset
-        let approval = _prevVersion.setApprovalForAll(_operator, true) external; // Approve or remove operator as an operator for the caller. Operators can call transferFrom or safeTransferFrom for any token owned by the caller.The operator cannot be the caller. Emits an ApprovalForAll event.
+        let approval = _prevVersion.setApprovalForAll(_operator, true) external; // Approve or remove operator as an operator for the caller. Operators can call transferFrom or safeTransferFrom for any token owned by the caller. The operator cannot be the caller. Emits an ApprovalForAll event.
+        console.log("APPROVAL: ", approval);
+        let checkingApproval = _prevVersion.isApprovedForAll(_owner,_operator)
+        console.log("CHECK: ", checkingApproval);78
 
         if ( approval ) {
 
             // Run transfer
-            _prevVersion.reCreateState()
+            _prevVersion.createState()
 
             // Upgrade contract set the User as the owner
             _owner = _prevVersion._owner;
