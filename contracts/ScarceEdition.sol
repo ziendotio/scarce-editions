@@ -18,6 +18,8 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
     // PHOENIX UPGRADE
     ScarceEdition public _nextVersion;
     ScarceEdition public _prevVersion;
+    address private _upgradeOperator;
+
     
     event Burn(address indexed burner, uint256 value);
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
@@ -39,6 +41,15 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
         if ((msg.sender != _owner) && (msg.sender != _operator)) {
             revert(
                 "Only the contract owner or operator can perform this operation"
+            );
+        }
+        _;
+    }
+
+    modifier upgradeOnly() {
+        if ((msg.sender != _upgradeOperator)) {
+            revert(
+                "Only the contract upgrade can perform this operation"
             );
         }
         _;
@@ -104,59 +115,30 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // UPGRADE FUNCTIONALITY --->>> Research Upgradability #30
+
+        // Old contract set to not allow new NFTs to be created
+        // Set upgrade contract address
+        // User authorise upgrade contract to control the asset
+        // Upgrade contract reads the metadata from the current contract
+        // Upgrade contract create new NFT
+        // Upgrade contract set the User as the owner
+        // Upgrade contract burns the old NFT
+        // If no NFTs remain. Burn the contract
+
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
 
-    // function totalSupply() external view returns (uint256);
-
-    // /**
-    //  * @dev function to perform contract details transfer,
-    //  * @param _from -the current owner of the NFT
-    //  * @param _to -address of the new owner
-    //  * @param _tokenId -unique ID of the NFT to be transferred.
-    //  * @param _data -Additional Data.
-    //  */
-    // function safeTransferFrom(address from, address to, uint256 tokenId) external;
-    //     // a. It throws an error if the msg.sender is not the current owner, an authorized operator or an approved address for the NFT to be transferred.
-    //     // b. If the _from parameter doesn’t contain the address of the current owner, then error will be thrown.
-    //     // c. If the _to parameter is a zero address(invalid address).
-    //     // d. If the _tokenId is not a valid NFT.
-    //     // e. One of the most imperative part that must be understood is that as soon as the transfer is complete, this function checks if the _to address passed in the parameter is an Externally Owned Account(owned by a person) or a Contract Address(owned by a contract).
-
-    // /**
-    //  * @dev it allows the owner of the NFT to allow or prevent certain third parties, i.e., operators to manage all of his/her NFTs.
-    //  * @param _operator -the address of the operator who will be approved for control over the NFTs
-    //  * @param _approved -True if the provided operator is to be approved or False if the approval is to be revoked.
-    //  */
-    // function setApprovalForAll(address _operator, bool _approved) external;        
-    //     //  It throws an error if the msg.sender is not the current owner, an authorized operator or an approved address for the NFT to be transferred.
-
-    // /**
-    //  * @dev provides us with the information that whether or not an operator is authorized for another address.
-    //  * @param _owner -the Owner of the NFT
-    //  * @param _operator -The address of the third party that acts on behalf of the owner.
-    //  */
-    // function isApprovedForAll(address _owner, address _operator) external view returns (bool);   
-
-    // /**
-    //  * @dev Destroys tokenId. The approval is cleared when the token is burned.
-    //  * @param _owner -the Owner of the NFT
-    //  * @param _operator -The address of the third party that acts on behalf of the owner.
-    //  */
-    // function _burn(uint256 tokenId);
-
-
-
-
-
+       // you can call it anything you want
+    function destroyContract() public upgradeOnly {
+        suicide(owner);
+    }
 
     /**
      * @dev Replicate Contract State.
      * @param _owner -the Owner of the NFT
      * @param _operator -The address of the third party that acts on behalf of the owner.
      */
-
     function createState() external {
 
         // get NTFs state
@@ -172,7 +154,7 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
             // read metadata from nft
             prevNTFuri = _prevVersion//get URI of token
 
-            // replicate token
+            // replicate token // create(address to, uint256 tokenId, string memory uri);
             safeReCreate = create( _owner, tokenId[i], string memory prevNTFuri );
 
             if ( safeReCreate ) {
@@ -182,10 +164,6 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
         }
         }
     };
-
-
-            // safeTransfer = _prevVersion.safeTransferFrom(_owner, _operator, tokenId[i]); // return bool 
-            // create(address to, uint256 tokenId, string memory uri);
     
     /** 
      * @dev Logic for Phoenix Upgrade.
@@ -193,23 +171,26 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
      */
     function createUpgrade ( address prevVersion ) public onlyOwner returns (address) {
 
-        // set reference hook to previous version 
-        _prevVersion = prevVersion;
+        // set reference hook to previous version // _prevVersion = prevVersion;
+        _prevVersion = ScarceEdition(prevVersion);
         console.log("PREV: ", _prevVersion);
 
         // set previous version reference hook to this version
-        _prevVersion._nextVersion = address(this);
+        _prevVersion._nextVersion = ScarceEdition(address(this));
         console.log("PREV pointer: ", _prevVersion._nextVersion);
+
+        // set NextVersion as operator of prevVersion contract
+        _prevVersion._upgradeOperator = address(this)
 
         // Old contract set to not allow new NFTs to be created
         _prevVersion.pause();
         console.log("PREV paused", _prevVersion.paused());
 
-        // User authorise upgrade contract to control the asset
+        // User authorise upgrade contract to control the asset // The operator cannot be the caller
         let approval = _prevVersion.setApprovalForAll(_operator, true) external; // Approve or remove operator as an operator for the caller. Operators can call transferFrom or safeTransferFrom for any token owned by the caller. The operator cannot be the caller. Emits an ApprovalForAll event.
         console.log("APPROVAL: ", approval);
         let checkingApproval = _prevVersion.isApprovedForAll(_owner,_operator)
-        console.log("CHECK: ", checkingApproval);78
+        console.log("CHECK: ", checkingApproval);
 
         if ( approval ) {
 
@@ -219,11 +200,14 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
             // Upgrade contract set the User as the owner
             _owner = _prevVersion._owner;
             _operator = _prevVersion._operator;
-            
-        }
+
+            // if contract has no ntfs left, burn the contract?
+            if ( !prevVersion.totalSupply() )
 
         } else {
+
             _prevVersion._unpause()
+
         }
 
 
