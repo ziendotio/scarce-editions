@@ -3,27 +3,28 @@
 pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
 
+// INTERFACES
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
+// EXTENSIONS
+import "/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 
-contract ScarceEdition is ERC721, Pausable, Burnable {
+contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
     uint256 constant maxBatch = 40;
 
     address private _owner;
     address private _operator;
+    address private _upgradeOperator;
+    bool private _upgradeApproval
 
     // PHOENIX UPGRADE
     ScarceEdition public _nextVersion;
     ScarceEdition public _prevVersion;
-    address private _upgradeOperator;
 
-    
-    event Burn(address indexed burner, uint256 value);
-    event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
-    event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
+    // authorised[owner][operator] -> will evaluate to true if operator is an operator for owner, and false otherwise
+    mapping (address => mapping (address => bool)) internal authorised;
 
     constructor() public ERC721("zien scarce editions", "AZSC") {
         _owner = msg.sender;
@@ -88,7 +89,6 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
     ) public ownerOrOperatorOnly returns (bool) {
         require(paused == false, "Contract Paused");
 
-
         if (batchSize > maxBatch) {
             revert("Batches can not exceed the max batch size (10)");
         }
@@ -129,8 +129,42 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
 
-       // you can call it anything you want
-    function destroyContract() public upgradeOnly {
+
+
+    setNextVersion ( address upgrade) public view upgradeOnly {
+
+        _nextVersion = ScarceEdition( upgrade );
+
+    }
+
+    setUpgradeOperator( address upgrade) public view upgradeOnly {
+
+        _upgradeOperator = upgrade
+
+    }
+
+    pauseContract() public view upgradeOnly {
+
+        pause();
+        return paused();
+    }
+
+    runApproval ( address newOperator, bool status ) public view upgradeOnly {
+        // run logic for ownership transfer to new contract?
+        transferOwnership(newOperator)
+        // setApprovalForAll(newOperator, status) external; // Approve or remove operator as an operator for the caller. Operators can call transferFrom or safeTransferFrom for any token owned by the caller. The operator cannot be the caller. Emits an ApprovalForAll event.
+        isApprovedForAll(_owner,_operator)
+
+    }
+
+    getTokenURI( number id ) view public {
+
+        require(isValidToken(_tokenId));
+        tokenURI( tokenId[i] );
+
+    }
+
+    function burnContract() public view upgradeOnly {
         suicide(owner);
     }
 
@@ -139,20 +173,22 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
      * @param _owner -the Owner of the NFT
      * @param _operator -The address of the third party that acts on behalf of the owner.
      */
-    function createState() external {
+    function createState() whenNotPaused() external {
 
         // get NTFs state
-        ntfsAmount = prevVersion.totalSupply();  
-        console.log("PREV total supply: ", ntfsAmount)
+        prevNFTAmount = prevVersion.totalSupply();  
+        console.log("PREV total supply: ", prevNFTAmount)
 
         // If no NTF bearer
-        if ( ntfsAmount == 0 ) return true;
-        
+        if ( prevNFTAmount == 0 ) return true;
+
         // If multiple unique NFTs
         for (uint256 i = 0; i < batchSize; i++) {
 
             // read metadata from nft
-            prevNTFuri = _prevVersion//get URI of token
+            // The tokenURI function takes a tokenId as its only argument, and returns a URI which points to metadata about that specific token.
+            // prevNTFuri = _prevVersion.tokenURI( tokenId[i] ) //get URI of token
+            prevNTFuri = _prevVersion.getTokenURI(tokenId[i] ) //get URI of token
 
             // replicate token // create(address to, uint256 tokenId, string memory uri);
             safeReCreate = create( _owner, tokenId[i], string memory prevNTFuri );
@@ -169,40 +205,41 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
      * @dev Logic for Phoenix Upgrade.
      * @param _prevVersion -the current contract address.
      */
-    function createUpgrade ( address prevVersion ) public onlyOwner returns (address) {
+    function createUpgrade ( address prevVersion ) whenNotPaused() public onlyOwner returns (address) {
+
+        currentAddress = address(this)
 
         // set reference hook to previous version // _prevVersion = prevVersion;
         _prevVersion = ScarceEdition(prevVersion);
         console.log("PREV: ", _prevVersion);
 
         // set previous version reference hook to this version
-        _prevVersion._nextVersion = ScarceEdition(address(this));
+        _prevVersion.setNextVersion(address(this));
+        // _prevVersion._nextVersion = ScarceEdition(address(this));
         console.log("PREV pointer: ", _prevVersion._nextVersion);
 
         // set NextVersion as operator of prevVersion contract
-        _prevVersion._upgradeOperator = address(this)
+         _prevVersion.setUpgradeOperator(address(this))
+        // _prevVersion._upgradeOperator = address(this)
 
         // Old contract set to not allow new NFTs to be created
-        _prevVersion.pause();
+        _prevVersion.pauseContract()
         console.log("PREV paused", _prevVersion.paused());
 
         // User authorise upgrade contract to control the asset // The operator cannot be the caller
-        let approval = _prevVersion.setApprovalForAll(_operator, true) external; // Approve or remove operator as an operator for the caller. Operators can call transferFrom or safeTransferFrom for any token owned by the caller. The operator cannot be the caller. Emits an ApprovalForAll event.
-        console.log("APPROVAL: ", approval);
-        let checkingApproval = _prevVersion.isApprovedForAll(_owner,_operator)
-        console.log("CHECK: ", checkingApproval);
+        _upgradeApproval = _prevVersion.runApproval(address(this), true);
 
-        if ( approval ) {
+        if ( _upgradeApproval ) {
 
-            // Run transfer
-            _prevVersion.createState()
+            // Reproduce Assets
+            createState();
 
             // Upgrade contract set the User as the owner
             _owner = _prevVersion._owner;
             _operator = _prevVersion._operator;
 
             // if contract has no ntfs left, burn the contract?
-            if ( !prevVersion.totalSupply() )
+            if ( !prevVersion.totalSupply() ) _prevVersion.burnContract();
 
         } else {
 
@@ -210,7 +247,7 @@ contract ScarceEdition is ERC721, Pausable, Burnable {
 
         }
 
-
+    
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
