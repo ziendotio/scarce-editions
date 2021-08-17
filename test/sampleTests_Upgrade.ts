@@ -16,32 +16,48 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-wit
 // If no NFTs remain. Burn the contract
 
 describe('ScarceEdition_Upgrade', function() {
-	let CONTRACT: any;
+	let CONTRACTPREV: any;
+	let CONTRACTNEXT: any;
 	let ScarceEditionContract: any;
 	let addrOwner: SignerWithAddress;
 	let addrRecipient: SignerWithAddress;
 	let addrOperator: SignerWithAddress;
-	let addrUpgradeOperator: SignerWithAddress;
+	let addrUpgrader: SignerWithAddress;
 
 	const createError: string = "Only the contract owner or operator can perform this operation";
 
 	beforeEach(async () => {
+
+        // Contract reference
 		ScarceEditionContract = await ethers.getContractFactory(
 			'ScarceEdition'
 		);
-		[addrOwner, addrRecipient, addrOperator, addrUpgradeOperator] = await ethers.getSigners();
-		CONTRACT = await ScarceEditionContract.deploy(); // addrOwner.address
-		await CONTRACT.deployed();
+
+        // Set accounts
+		[addrOwner, addrRecipient, addrOperator, addrUpgrader] = await ethers.getSigners();
+
+        // Deploy two versions
+		CONTRACTPREV = await ScarceEditionContract.deploy(); 
+		await CONTRACTPREV.deployed();
+        console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+		CONTRACTNEXT = await ScarceEditionContract.deploy(); 
+		await CONTRACTNEXT.deployed();
+        console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
 	});
 
 	describe('Deployment', () => {
-		it('Should assign total supply of token to owner', async () => {
-			const ownerBalance = await CONTRACT.balanceOf(addrOwner.address);
-			expect(await CONTRACT.totalSupply()).to.equal(ownerBalance);
+		it('PREV: Should assign total supply of token to owner', async () => {
+			const ownerBalance = await CONTRACTPREV.balanceOf(addrOwner.address);
+			expect(await CONTRACTPREV.totalSupply()).to.equal(ownerBalance);
+		});
+		it('NEXT: Should assign total supply of token to owner', async () => {
+			const ownerBalance = await CONTRACTNEXT.balanceOf(addrOwner.address);
+			expect(await CONTRACTNEXT.totalSupply()).to.equal(ownerBalance);
 		});
 	});
 
-	describe('Upgrade', () => {
+	describe.only('Upgrade', () => {
+
 		//
 
         describe('Initialisation', () => {

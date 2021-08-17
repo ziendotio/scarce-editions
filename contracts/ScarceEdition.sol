@@ -1,30 +1,27 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.7.6;
+
 pragma experimental ABIEncoderV2;
 
-// INTERFACES
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
-// EXTENSIONS
-import "/openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
+contract ScarceEdition is ERC721, ERC721Pausable, ERC721Burnable {
     uint256 constant maxBatch = 40;
 
     address private _owner;
     address private _operator;
-    address private _upgradeOperator;
-    bool private _upgradeApproval
-
-    // PHOENIX UPGRADE
-    ScarceEdition public _nextVersion;
-    ScarceEdition public _prevVersion;
+    address public upgrader;
+    bool private _upgradeApproval;
+    ScarceEdition public nextVersion;
+    ScarceEdition public prevVersion;
 
     // authorised[owner][operator] -> will evaluate to true if operator is an operator for owner, and false otherwise
-    mapping (address => mapping (address => bool)) internal authorised;
+    // mapping(address => mapping(address => bool)) internal authorised;
 
     constructor() public ERC721("zien scarce editions", "AZSC") {
         _owner = msg.sender;
@@ -38,7 +35,7 @@ contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
         _;
     }
 
-    modifier ownerOrOperatorOnly() {
+    modifier onlyOwnerOrOperator() {
         if ((msg.sender != _owner) && (msg.sender != _operator)) {
             revert(
                 "Only the contract owner or operator can perform this operation"
@@ -47,11 +44,9 @@ contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
         _;
     }
 
-    modifier upgradeOnly() {
-        if ((msg.sender != _upgradeOperator)) {
-            revert(
-                "Only the contract upgrade can perform this operation"
-            );
+    modifier onlyUpgrader() {
+        if ((msg.sender != upgrader)) {
+            revert("Only the contract upgrader can perform this operation");
         }
         _;
     }
@@ -66,9 +61,9 @@ contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
         address to,
         uint256 tokenId,
         string memory uri
-    ) public ownerOrOperatorOnly returns (bool) {
+    ) public onlyOwnerOrOperator returns (bool) {
         require(paused == false, "Contract Paused");
-        
+
         _mint(to, tokenId);
         _setTokenURI(tokenId, uri);
 
@@ -86,7 +81,7 @@ contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
         address[maxBatch] memory to,
         uint256[maxBatch] memory tokenId,
         string[maxBatch] memory uri
-    ) public ownerOrOperatorOnly returns (bool) {
+    ) public onlyOwnerOrOperator returns (bool) {
         require(paused == false, "Contract Paused");
 
         if (batchSize > maxBatch) {
@@ -107,152 +102,69 @@ contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
      */
     function setOperator(address operator) public onlyOwner returns (bool) {
         _operator = operator;
-
         return true;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-    // UPGRADE FUNCTIONALITY --->>> Research Upgradability #30
-
-        // Old contract set to not allow new NFTs to be created
-        // Set upgrade contract address
-        // User authorise upgrade contract to control the asset
-        // Upgrade contract reads the metadata from the current contract
-        // Upgrade contract create new NFT
-        // Upgrade contract set the User as the owner
-        // Upgrade contract burns the old NFT
-        // If no NFTs remain. Burn the contract
-
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-
-
-
-    setNextVersion ( address upgrade) public view upgradeOnly {
-
-        _nextVersion = ScarceEdition( upgrade );
-
-    }
-
-    setUpgradeOperator( address upgrade) public view upgradeOnly {
-
-        _upgradeOperator = upgrade
-
-    }
-
-    pauseContract() public view upgradeOnly {
-
-        pause();
-        return paused();
-    }
-
-    runApproval ( address newOperator, bool status ) public view upgradeOnly {
-        // run logic for ownership transfer to new contract?
-        transferOwnership(newOperator)
-        // setApprovalForAll(newOperator, status) external; // Approve or remove operator as an operator for the caller. Operators can call transferFrom or safeTransferFrom for any token owned by the caller. The operator cannot be the caller. Emits an ApprovalForAll event.
-        isApprovedForAll(_owner,_operator)
-
-    }
-
-    getTokenURI( number id ) view public {
-
-        require(isValidToken(_tokenId));
-        tokenURI( tokenId[i] );
-
-    }
-
-    function burnContract() public view upgradeOnly {
-        suicide(owner);
+    /**
+     * @dev function to set reference to previous version.
+     * @param operator The address of the new operator
+     */
+    function setpreviousVersion(address previousAddress)
+        external
+        view
+        onlyUpgrader
+        returns (bool)
+    {
+        _prevVersion = ScarceEdition(previousAddress);
+        return true;
     }
 
     /**
-     * @dev Replicate Contract State.
-     * @param _owner -the Owner of the NFT
-     * @param _operator -The address of the third party that acts on behalf of the owner.
+     * @dev function to set reference to upgrade version.
+     * @param operator The address of the new operator
      */
-    function createState() whenNotPaused() external {
+    function setNextVersion(address upgradeAddress)
+        external
+        view
+        onlyUpgrader
+        returns (bool)
+    {
+        _nextVersion = ScarceEdition(upgradeAddress);
+        return true;
+    }
 
-        // get NTFs state
-        prevNFTAmount = prevVersion.totalSupply();  
-        console.log("PREV total supply: ", prevNFTAmount)
+    /**
+     * @dev function to set upgrade role
+     * @param operator The address of the new operator
+     */
+    function setupgrader(address upgrade)
+        external
+        view
+        onlyUpgrader
+        returns (bool)
+    {
+        upgrader = upgrade;
+        return true;
+    }
 
-        // If no NTF bearer
-        if ( prevNFTAmount == 0 ) return true;
-
-        // If multiple unique NFTs
-        for (uint256 i = 0; i < batchSize; i++) {
-
-            // read metadata from nft
-            // The tokenURI function takes a tokenId as its only argument, and returns a URI which points to metadata about that specific token.
-            // prevNTFuri = _prevVersion.tokenURI( tokenId[i] ) //get URI of token
-            prevNTFuri = _prevVersion.getTokenURI(tokenId[i] ) //get URI of token
-
-            // replicate token // create(address to, uint256 tokenId, string memory uri);
-            safeReCreate = create( _owner, tokenId[i], string memory prevNTFuri );
-
-            if ( safeReCreate ) {
-                // delete the contract
-                _prevVersion._burn(tokenId[i]); 
-            }
-        }
-        }
-    };
-    
-    /** 
+    /**
      * @dev Logic for Phoenix Upgrade.
      * @param _prevVersion -the current contract address.
      */
-    function createUpgrade ( address prevVersion ) whenNotPaused() public onlyOwner returns (address) {
-
+    function createUpgrade(address prevVersionAddress)
+        public
+        whenNotPaused
+        onlyOwner
+        returns (bool)
+    {
         // set reference hook to previous version // _prevVersion = prevVersion;
-        _prevVersion = ScarceEdition(prevVersion);
-        console.log("CURR version: ", _prevVersion);
+        prevVersion = setpreviousVersion(prevVersionAddress);
+        console.log("NEXT set previous version to : ", prevVersion);
 
         // set previous version reference hook to this version
-        _prevVersion.setNextVersion(address(this));
-        console.log("PREV pointer: ", _prevVersion._nextVersion);
+        prevVersion.setNextVersion(address(this));
+        console.log("PREV set next version to : ", prevVersion.nextVersion);
 
-        // set NextVersion as operator of prevVersion contract
-        _prevVersion.setUpgradeOperator(address(this))
-        console.log("PREV upgrade Operator", _prevVersion._upgradeOperator);
-        console.log("PREV operator", _prevVersion._operator);
-
-        // Old contract set to not allow new NFTs to be created
-        _prevVersion.pauseContract()
-        console.log("PREV paused", _prevVersion.paused());
-
-        // User authorise upgrade contract to control the asset // The operator cannot be the caller
-        _upgradeApproval = _prevVersion.runApproval(address(this), true);
-
-        if ( _upgradeApproval ) {
-
-            // Reproduce Assets
-            createState();
-
-            // Upgrade contract set the User as the owner
-            _owner = _prevVersion._owner;
-            _operator = _prevVersion._operator;
-
-            // if contract has no ntfs left, burn the contract?
-            if ( !prevVersion.totalSupply() ) _prevVersion.burnContract();
-
-        } else {
-
-            _prevVersion._unpause()
-
-        }
-
-    
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-    // UPGRADE FUNCTIONALITY --->>> Research Upgradability #30
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------------------------------------
-
-
+        return true;
     }
+}
