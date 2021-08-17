@@ -207,20 +207,18 @@ contract ScarceEdition is ERC721, IERC721Metadata, Pausable, Burnable {
      */
     function createUpgrade ( address prevVersion ) whenNotPaused() public onlyOwner returns (address) {
 
-        currentAddress = address(this)
-
         // set reference hook to previous version // _prevVersion = prevVersion;
         _prevVersion = ScarceEdition(prevVersion);
-        console.log("PREV: ", _prevVersion);
+        console.log("CURR version: ", _prevVersion);
 
         // set previous version reference hook to this version
         _prevVersion.setNextVersion(address(this));
-        // _prevVersion._nextVersion = ScarceEdition(address(this));
         console.log("PREV pointer: ", _prevVersion._nextVersion);
 
         // set NextVersion as operator of prevVersion contract
-         _prevVersion.setUpgradeOperator(address(this))
-        // _prevVersion._upgradeOperator = address(this)
+        _prevVersion.setUpgradeOperator(address(this))
+        console.log("PREV upgrade Operator", _prevVersion._upgradeOperator);
+        console.log("PREV operator", _prevVersion._operator);
 
         // Old contract set to not allow new NFTs to be created
         _prevVersion.pauseContract()
