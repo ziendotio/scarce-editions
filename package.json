@@ -17,7 +17,9 @@
   "homepage": "https://github.com/joinzien/scarce-editions",
   "author": "zien <hello@zien.io>",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "c": "^1.1.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

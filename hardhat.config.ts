@@ -30,37 +30,13 @@ const config: HardhatUserConfig = {
 		version: '0.7.6',
 		settings: {
 			optimizer: {
-				enabled: true,
+				enabled: true,	
 				runs: 200,
 			},
 		},
 	},
 	networks: {
 		hardhat: {
-			// Commands
-				// npx hardhat node --fork https://mainnet2.edgewa.re/evm
-				// npx hardhat run --network localhost scripts/deploy.js
-				// npx hardhat test --network localhost 
-			// HardhatConfigObject // https://hardhat.org/config/#hardhat-network
-			forking: { 
-				url: `https://mainnet2.edgewa.re/evm`,
-			},
-			accounts: PRIVATE_KEY_ROLE_OBJ,
-		},
-		// Beresheet network specification
-		Beresheet: { // npx hardhat run --network Beresheet scripts/deploy.js
-			url: `https://beresheet2.edgewa.re/evm`,
-			chainId: 2022,
-			accounts: [TESTNET_PRIVATE_KEY],
-		},
-		// Mainnet network specification
-		Edgeware: {
-			// Commands // npx hardhat run --network Edgeware scripts/deploy.js
-			// HardhatConfigObject // https://hardhat.org/config/#json-rpc-based-networks
-			url: `https://mainnet.edgewa.re/evm`,
-			chainId: 2021,
-			accounts: [MAINNET_PRIVATE_KEY],
-			gas: 1800,
 		},
 	},
 };

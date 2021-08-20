@@ -321,3 +321,51 @@ uint256 constant maxBatch = 40;
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
     // ---------------------------------------------------------------------------------------------------------
+
+
+        // // User authorise upgrade contract to control the asset // The operator cannot be the caller
+        // describe.only('Interoperability', () => {
+        //     // _upgradeApproval = _prevVersion.runApproval(address(this), true);
+
+        //     it('upgrade: upgrade contract become _operator or _owner', async () => {
+
+        //         console.log("\n")
+        //         console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+        //         console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
+        //         console.log("Owner : ",  addrOwner.address);
+        //         console.log("Operator : ", addrOperator.address);
+
+        //         // Creates a new Edition as owner
+
+        //         const tokenID = 1234567890;
+        //         const tokenURIBefore = 'http://scarce.editions/one';
+        //         const setOperatorRes = await CONTRACTPREV.setOperator(
+        //             addrOperator.address
+        //         );
+        //         const totalSupplyBefore = await CONTRACTPREV.totalSupply();
+        //         await CONTRACTPREV.create(
+        //             addrRecipient.address,
+        //             tokenID,
+        //             tokenURIBefore
+        //         );
+        //         const totalSupplyAfter = await CONTRACTPREV.totalSupply();
+        //         const tokenURIAfter = await CONTRACTPREV.tokenURI(tokenID);
+        //         expect(totalSupplyBefore.toNumber() + 1).to.equal(
+        //             totalSupplyAfter.toNumber()
+        //         );
+        //         expect(tokenURIBefore).to.equal(tokenURIAfter);
+        //         console.log("NFT created..")
+
+        //         // Authorise upgrade contract to control the asset
+
+        //             // setApprovalForAll(operator, approved)
+        //             // isApprovedForAll(owner, operator)
+        //             // _exists(tokenId)
+        //             // _isApprovedOrOwner(spender, tokenId)
+
+        //     });
+
+        //     it('upgrade: upgrade contract can call previous versions functions', async () => {
+        //     });
+
+        // })
