@@ -39,11 +39,11 @@ describe('ScarceEdition_Upgrade', function() {
         // Deploy two versions
 		CONTRACTPREV = await ScarceEditionContract.deploy(); 
 		await CONTRACTPREV.deployed();
-        // console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+        // console.log('TEST_ CALL ScarceEdition PREV deployed to:', CONTRACTPREV.address);
 
 		CONTRACTNEXT = await ScarceEditionContract.deploy(); 
 		await CONTRACTNEXT.deployed();
-        // console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
+        // console.log('TEST_ CALL ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
 	});
 
 	describe('Deployment', () => {
@@ -66,131 +66,77 @@ describe('ScarceEdition_Upgrade', function() {
             beforeEach(async () => {
 
                 console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address);
-                console.log("Operator : ", addrOperator.address); 
+                console.log('TEST_ CALL ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+                console.log('TEST_ CALL ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
+                console.log("TEST_ CALL Owner : ",  addrOwner.address);
+                console.log("TEST_ CALL Operator : ", addrOperator.address); 
                 console.log("\n")
 
             });
 
-            it('upgrade: sets previous version reference on upgrade contract', async () => {
-
-                console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address);
-                console.log("Operator : ", addrOperator.address);
+            it('upgrade versions: sets previous version reference on upgrade contract', async () => {
 
                 const previousAddressBefore = CONTRACTPREV.address;
-                console.log("previousAddressBefore = ", previousAddressBefore );
+                console.log("TEST_ CALL previousAddressBefore = ", previousAddressBefore );
 
                 await CONTRACTNEXT.connect(addrOwner).set_previousVersion(previousAddressBefore);
 
                 const previousAddressAfter = await CONTRACTNEXT.get_previousVersion();
-                console.log("previousAddressAfter = ", previousAddressAfter );
+                console.log("TEST_ CALL previousAddressAfter = ", previousAddressAfter );
 
                 expect(previousAddressAfter).to.equal(previousAddressBefore);
-                console.log("\n")
+                console.log("TEST_ CALL \n")
 
             });
 
-            it('upgrade: sets upgrade version reference on previous contract', async () => {
-
-                console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address)   
-                console.log("Operator : ", addrOperator.address )   
-
-                // await CONTRACTPREV.set_upgraderRole(CONTRACTNEXT.address, {
-                //     from: addrOwner.address,
-                // });
+            it('upgrade versions: sets upgrade version reference on previous contract', async () => {
 
                 const nextAddressBefore = CONTRACTNEXT.address;
-                console.log("nextAddressBefore = ", nextAddressBefore );
+                console.log("TEST_ CALL nextAddressBefore = ", nextAddressBefore );
 
                 await CONTRACTPREV.connect(addrOwner).set_nextVersion(CONTRACTNEXT.address);
 
                 const nextAddressAfter = await CONTRACTPREV.get_nextVersion();
-                console.log("nextAddressAfter = ", nextAddressAfter );
+                console.log("TEST_ CALL nextAddressAfter = ", nextAddressAfter );
                 expect(nextAddressAfter).to.equal(nextAddressBefore);
-                console.log("\n")
+                console.log("TEST_ CALL \n")
 
             });
 
-            it('upgrade script: sets prevVersison on nextVersion, and nextVersion on prevVersion through createUpgrade()', async () => {
-
-                console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address)   
-                console.log("Operator : ", addrOperator.address )   
-                
-                const previousAddressBefore = CONTRACTPREV.address;
-                const nextAddressBefore = CONTRACTNEXT.address;
-                
-                await CONTRACTNEXT.connect(addrOwner).createUpgrade(CONTRACTPREV.address);
-
-                const previousAddressAfter = await CONTRACTNEXT.get_previousVersion();
-                const nextAddressAfter = await CONTRACTPREV.get_nextVersion();
-
-                expect(previousAddressAfter).to.equal(previousAddressBefore);
-                expect(nextAddressAfter).to.equal(nextAddressBefore);
-                console.log("\n")
-
-            });
         })
 
-        
         describe('Upgrade Role', () => {
 
             beforeEach(async () => {
 
                 console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address);
-                console.log("Operator : ", addrOperator.address); 
+                console.log('TEST_ CALL ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+                console.log('TEST_ CALL ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
+                console.log("TEST_ CALL Owner : ",  addrOwner.address);
+                console.log("TEST_ CALL Operator : ", addrOperator.address); 
                 console.log("\n")
+
+            });
+
+            it('upgrade: retrieves contract Owner and Operator', async () => {
+
+                const owner = await CONTRACTPREV.connect(addrOwner).get_owner();
+                const operator = await CONTRACTPREV.connect(addrOwner). get_operator();
+                expect(owner).to.equal(addrOwner.address);
+                expect(operator).to.equal(owner);
 
             });
 
             it('upgrade: sets upgrade_role on previous contract', async () => {
 
-                console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address)   
-                console.log("Operator : ", addrOperator.address )   
-                
                 const upgradeAddress_Before = CONTRACTNEXT.address;
                 
-                await CONTRACTPREV.connect(addrOwner).set_upgraderRole(CONTRACTNEXT.address);
+                await CONTRACTPREV.connect(addrOwner).set_upgrader(CONTRACTNEXT.address);
 
-                const upgradeAddress_After = await CONTRACTPREV.get_upgraderRole();
-
-                expect(upgradeAddress_After).to.equal(upgradeAddress_Before);
-                console.log("\n")
-
-            });
-
-            it('upgrade script: does not allow previous version NFT minting', async () => {
-
-                console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address)   
-                console.log("Operator : ", addrOperator.address )   
-
-                const upgradeAddress_Before = CONTRACTNEXT.address;
-                
-                await CONTRACTNEXT.connect(addrOwner).createUpgrade(CONTRACTPREV.address);
-
-                const upgradeAddress_After = await CONTRACTPREV.get_upgraderRole();
+                const upgradeAddress_After = await CONTRACTPREV.get_upgrader();
 
                 expect(upgradeAddress_After).to.equal(upgradeAddress_Before);
-                console.log("\n")
+                console.log("TEST_ CALL \n")
 
             });
         })
@@ -201,74 +147,52 @@ describe('ScarceEdition_Upgrade', function() {
             beforeEach(async () => {
 
                 console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address);
-                console.log("Operator : ", addrOperator.address); 
+                console.log('TEST_ CALL ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+                console.log('TEST_ CALL ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
+                console.log("TEST_ CALL Owner : ",  addrOwner.address);
+                console.log("TEST_ CALL Operator : ", addrOperator.address); 
                 console.log("\n")
 
             });
 
             it('upgrade: pauses previous version contract', async () => {
 
-                console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address);
-                console.log("Operator : ", addrOperator.address);  
-
                 await CONTRACTPREV.connect(addrOwner).set_pauseVersion();
-                const isPaused = await CONTRACTPREV.get_pauseVersion();
-
-                expect(isPaused).to.equal(true);
-                console.log("\n")
-            });
-
-            it('upgrade script: pauses previous version contract', async () => {
-
-                console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address);
-                console.log("Operator : ", addrOperator.address); 
-
-                await CONTRACTNEXT.connect(addrOwner).createUpgrade(CONTRACTPREV.address);
 
                 const isPaused = await CONTRACTPREV.get_pauseVersion();
 
                 expect(isPaused).to.equal(true);
-                console.log("\n")
-
-                
+                console.log("TEST_ CALL \n")
             });
+
         })
 
-        describe.only('Replication', () => {
+        describe('Replication', () => {
             // Upgrade contract reads the metadata from the current contract
             // Upgrade contract create new NFT
 
             beforeEach(async () => {
 
                 console.log("\n")
-                console.log('ScarceEdition PREV deployed to:', CONTRACTPREV.address);
-                console.log('ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
-                console.log("Owner : ",  addrOwner.address);
-                console.log("Operator : ", addrOperator.address); 
+                console.log('TEST_ CALL ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+                console.log('TEST_ CALL ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
+                console.log("TEST_ CALL Owner : ",  addrOwner.address);
+                console.log("TEST_ CALL Operator : ", addrOperator.address); 
+                console.log("TEST_ CALL Recipient : ", addrRecipient.address); 
 
                 const tokenID = 1234567890;
                 const tokenURI = 'one';
                 const totalSupply_BeforeCreate = await CONTRACTPREV.totalSupply.call();
-                console.log("totalSupply_BeforeCreate: ", totalSupply_BeforeCreate)
+                console.log("TEST_ CALL totalSupply_BeforeCreate: ", totalSupply_BeforeCreate)
                 await CONTRACTPREV.create(
-                    addrOwner.address,
+                    addrRecipient.address,
                     tokenID,
                     tokenURI
                     );
                 const totalSupply_AfterCreate = await CONTRACTPREV.totalSupply.call();
-                console.log("totalSupply_AfterCreate: ", totalSupply_AfterCreate);
-                const tokenURIAfter = await CONTRACTPREV.tokenURI(tokenID);
+                console.log("TEST_ CALL totalSupply_AfterCreate: ", totalSupply_AfterCreate);
 
-                console.log("NFT created..")
+                console.log("TEST_ CALL NFT created..")
                 console.log("\n")
 
             });
@@ -276,82 +200,238 @@ describe('ScarceEdition_Upgrade', function() {
 
             it('upgrade: return contract total supply', async () => {
 
-                // this.balance
-                // How to return contract total supply 
-                const supply = await CONTRACTPREV.connect(addrOwner).totalSupply()
-                console.log("CONTRACT SUPPLY: ", supply);
+                const supply = await CONTRACTPREV.connect(addrOwner).totalSupply() // get_supply()
+                
                 expect(supply).to.equal(1);
 
             });
 
-            it.only('upgrade: return role balance', async () => {
+            it('upgrade: return role balance', async () => {
 
-                // make sure supply of contract is 1
+                const recipientBalance = (await CONTRACTPREV.connect(addrOwner).get_roleBalance(addrRecipient.address)).toNumber();
 
-                // How to return a role balance which should have been allocated NFT
-
-
-                const ownerBalance = await CONTRACTPREV.connect(addrOwner).get_roleBalance();
-                console.log("owner balance: ", ownerBalance);
-
-                expect(ownerBalance).to.equal(1);
-
+                expect(recipientBalance).to.equal(1);
 
             });
 
-            it('upgrade: return token ID provided an index', async () => {
+            it('upgrade: returns token ID for role account provided an index', async () => {
 
-                // const id1 = await CONTRACTPREV.connect(addrOwner).get_tokenOfOwnerByIndex("_OWNER", 0);
-                // const id2 = await CONTRACTPREV.connect(addrOwner).get_tokenOfOwnerByIndex("_OWNER", 1);
-                // console.log("TOKEN ID: ", id1)
-                // console.log("TOKEN ID: ", id2)
+                const tokenID = 9876543210;
+                const tokenURI = 'two';
+                await CONTRACTPREV.create(
+                    addrRecipient.address,
+                    tokenID,
+                    tokenURI
+                    );
+
+                const recipientBalance = (await CONTRACTPREV.connect(addrOwner).get_roleBalance(addrRecipient.address)).toNumber();
+
+                let tokenIDs = new Array();
+
+                for (let i = 0; i < recipientBalance; i++) {
+                    let token_Id = (await CONTRACTPREV.connect(addrOwner).get_tokenOfOwnerByIndex(addrRecipient.address, i)).toNumber(); 
+                    // console.log("TEST_ CALL TOKEN ID index: ", i , " is ", token_Id);
+                    tokenIDs.push(token_Id);
+                };
+
+                expect(tokenIDs.toString()).to.equal([ 1234567890, 9876543210 ].toString());
+
             });
 
             it('upgrade: return token URI provided token id', async () => {
 
-                // const tokenId = await CONTRACTPREV.connect(addrOwner).get_tokenOfOwnerByIndex("_OWNER", 0);
-                // const uri = await CONTRACTPREV.connect(addrOwner).get_tokenURI(tokenId);
+                const tokenID = 9876543210;
+                const tokenURI = 'two';
+                await CONTRACTPREV.create(
+                    addrRecipient.address,
+                    tokenID,
+                    tokenURI
+                    );
+                const recipientBalance = (await CONTRACTPREV.connect(addrOwner).get_roleBalance(addrRecipient.address)).toNumber();
+                let tokenIDs = new Array();
+
+                for (let i = 0; i < recipientBalance; i++) {
+                    let token_Id = (await CONTRACTPREV.connect(addrOwner).get_tokenOfOwnerByIndex(addrRecipient.address, i)).toNumber(); 
+                    // console.log("TEST_ CALL TOKEN ID index: ", i , " is ", token_Id);
+                    tokenIDs.push(token_Id);
+                };
+
+                let tokenURIs = new Array();
+
+                for ( let i = 0; i < tokenIDs.length; i++ ) {
+                    const uri = await CONTRACTPREV.connect(addrOwner).get_tokenURI(tokenIDs[i]);
+                    // console.log("TEST_ CALL RETRIEVED URI: ", uri);
+                    tokenURIs.push(uri);
+                }
+
+                expect(tokenURIs.toString()).to.equal([ "zien.io/one", "zien.io/two" ].toString());
 
             });
 
             it('upgrade: burn token provided token id', async () => {
 
-                // const totalSupply_BeforeBurn = await CONTRACTPREV.connect(addrOwner).totalSupply();
-                // const tokenId = await CONTRACTPREV.connect(addrOwner).get_tokenOfOwnerByIndex("_OWNER", 0);
-                // await CONTRACTPREV.connect(addrOwner).set_burnToken(tokenId);
-                // const totalSupply_AfterBurn = await CONTRACTPREV.connect(addrOwner).totalSupply();
+                // GET TOTAL SUPPLY AFTER MINTING
+                const totalSupply_BeforeBurn = await CONTRACTPREV.connect(addrOwner).totalSupply();
+                console.log("TEST_ CALL TOTAL SUPPLY BEFORE: ", totalSupply_BeforeBurn);
 
-                // expect(totalSupply_AfterBurn.toNumber()).to.equal(totalSupply_BeforeBurn.toNumber() - 1);
-            });
+                // GET ROLE BALANCE
+                const recipientBalance = (await CONTRACTPREV.connect(addrOwner).get_roleBalance(addrRecipient.address)).toNumber();
 
-            it('upgrade script: upgrade contract reads metadata from previous contract, reproduce state, clean up', async () => {
+                // RETRIEVE MINTED TOKEN IDs
+                let tokenIDs = new Array();
+                for (let i = 0; i < recipientBalance; i++) {
+                    let token_Id = (await CONTRACTPREV.connect(addrOwner).get_tokenOfOwnerByIndex(addrRecipient.address, i)).toNumber(); 
+                    // console.log("TEST_ CALL TOKEN ID index: ", i , " is ", token_Id);
+                    tokenIDs.push(token_Id);
+                };
 
-                // const totalSupply_BeforeReproduce = await CONTRACTPREV.connect(addrOwner).totalSupply();
-                // await CONTRACTNEXT.connect(addrOwner).reproduceState()
-                // const totalSupply_AfterReproduce = await CONTRACTPREV.connect(addrOwner).totalSupply();
-                // expect(totalSupply_BeforeReproduce.toNumber() - 1).to.equal(
-                //     totalSupply_AfterReproduce.toNumber()
-                //     );
+                // BURN ALL TOKENS
+                for ( let j = 0; j < tokenIDs.length; j++ ) {
+                    await CONTRACTPREV.connect(addrOwner).set_burnToken(tokenIDs[j]);
+                }
 
+                // GET TOTAL SUPPLY AFTER BURN RUN
+                const totalSupply_AfterBurn = await CONTRACTPREV.connect(addrOwner).totalSupply();
+                console.log("TEST_ CALL TOTAL SUPPLY AFTER: ", totalSupply_AfterBurn);
+
+                expect(totalSupply_AfterBurn.toNumber()).to.equal(0);
             });
 
         })
 
-        // // Upgrade contract set the User as the owner
-        // describe('Ownership', () => {
+        describe('Destroy', () => {
 
-        //     it('upgrade: upgrade contract owner becomes previous version owner', async () => {
-        //     });
+            it('upgrade destroy: contract is destroyed', async () => {
 
-        // })
+                // After a contract has called selfdestruct(), all values are set to 0
 
-        // // If no NFTs remain. Burn the contract
-        // describe('Clean Up', () => {
+                let checkBEFOREburn = await CONTRACTNEXT.connect(addrOwner).get_burnContract(CONTRACTPREV.address);
+                console.log("TEST_ BEFORE check if contract exist: ", checkBEFOREburn);
 
-        //     it('upgrade: burns previous version contract if no NTFs remain', async () => {
-        //     });
+                await CONTRACTPREV.connect(addrOwner).set_burnContract();
+                
+                let checkAFTERburn = await CONTRACTNEXT.connect(addrOwner).get_burnContract(CONTRACTPREV.address);
+                console.log("TEST_ AFTER check if contract exist: ", checkAFTERburn);
+                
+                expect(checkBEFOREburn).to.equal(true);
+                expect(checkAFTERburn).to.equal(false);
 
-        // })
+            });
+
+            it('upgrade destroy: contract is destroyed only if it does not hold NFTs', async () => {
+
+                const createError: string = "Operation aborted: the contract still holds NFTs";
+                const tokenID = 9876543210;
+                const tokenURI = 'two';
+                await CONTRACTPREV.create(addrOwner.address,tokenID,tokenURI);
+                
+                let check = await CONTRACTNEXT.connect(addrOwner).get_burnContract(CONTRACTPREV.address);
+                console.log("TEST_ check if contract exist ", check);
+
+                await expect(
+                    CONTRACTPREV.connect(addrOwner).set_burnContract()
+                ).to.be.revertedWith(createError);
+    
+            });
+
+        })
+
+
+        describe('upgrade script', () => {
+            // Upgrade contract reads the metadata from the current contract
+            // Upgrade contract create new NFT
+
+            beforeEach(async () => {
+
+                console.log("\n")
+                console.log('TEST_ CALL ScarceEdition PREV deployed to:', CONTRACTPREV.address);
+                console.log('TEST_ CALL ScarceEdition NEXT deployed to:', CONTRACTNEXT.address);
+                console.log("TEST_ CALL Owner : ",  addrOwner.address);
+                console.log("TEST_ CALL Operator : ", addrOperator.address); 
+                console.log("TEST_ CALL Recipient : ", addrRecipient.address); 
+                
+                const totalSupply_BeforeCreate = await CONTRACTPREV.totalSupply.call();
+                // console.log("TEST_ CALL totalSupply_BeforeCreate: ", totalSupply_BeforeCreate)
+
+                const tokenIDs = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+                const tokenURIs = [ 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'height', 'nine'];
+
+                for (let i = 0; i < tokenIDs.length; i++) {
+                    await CONTRACTPREV.create(
+                        addrOwner.address,
+                        tokenIDs[i],
+                        tokenURIs[i]
+                        );
+                };
+
+                const totalSupply_AfterCreate = await CONTRACTPREV.totalSupply.call();
+                console.log("TEST_ CALL BEFORE EACH PREV CREATED: ", totalSupply_AfterCreate.toNumber());
+
+                console.log("TEST_ CALL NFTs created..")
+                console.log("\n")
+
+            });
+
+            // SETTING ENDPOINTS
+
+            // it('upgrade script: sets prevVersison on nextVersion, and nextVersion on prevVersion through createUpgrade()', async () => {
+ 
+            //     const previousAddressBefore = CONTRACTPREV.address;
+            //     const nextAddressBefore = CONTRACTNEXT.address;
+                
+            //     await CONTRACTNEXT.connect(addrOwner).createUpgrade(CONTRACTPREV.address);
+
+            //     const previousAddressAfter = await CONTRACTNEXT.get_previousVersion();
+            //     const nextAddressAfter = await CONTRACTPREV.get_nextVersion();
+
+            //     expect(previousAddressAfter).to.equal(previousAddressBefore);
+            //     expect(nextAddressAfter).to.equal(nextAddressBefore);
+            //     console.log("TEST_ CALL \n")
+
+            // });
+
+            // PAUSING VERSIONS
+
+            // it('upgrade script: pauses previous version contract', async () => {
+            //     await CONTRACTNEXT.connect(addrOwner).createUpgrade(CONTRACTPREV.address);
+            //     const isPaused = await CONTRACTPREV.get_pauseVersion();
+            //     expect(isPaused).to.equal(true);
+            // });
+
+            it('upgrade script: scripts reproduces states', async () => {
+
+                const previousAddressBefore = CONTRACTPREV.address;
+                const nextAddressBefore = CONTRACTNEXT.address;
+                
+                const prev_totalSupply_BeforeReproduce = await CONTRACTPREV.connect(addrOwner).totalSupply();
+                const next_totalSupply_BeforeReproduce = await CONTRACTNEXT.connect(addrOwner).totalSupply();
+
+                await CONTRACTNEXT.connect(addrOwner).createUpgrade(CONTRACTPREV.address);
+                
+                const previousAddressAfter = await CONTRACTNEXT.get_previousVersion();
+                const nextAddressAfter = await CONTRACTPREV.get_nextVersion();
+
+                const prev_totalSupply_AfterReproduce = await CONTRACTPREV.connect(addrOwner).totalSupply();
+                const next_totalSupply_AfterReproduce = await CONTRACTNEXT.connect(addrOwner).totalSupply();
+
+                const isPaused = await CONTRACTPREV.get_pauseVersion();
+                
+                // CHECK ADDRESSES
+                expect(previousAddressAfter).to.equal(previousAddressBefore);
+                expect(nextAddressAfter).to.equal(nextAddressBefore);
+    
+                // CONTRACT IS PAUSED
+                expect(isPaused).to.equal(true);
+
+                // TOKEN HAVE BEEN TRANSFERED
+                expect(prev_totalSupply_BeforeReproduce.toNumber()).to.equal(10);
+                expect(prev_totalSupply_AfterReproduce.toNumber()).to.equal(0);
+                expect(next_totalSupply_BeforeReproduce.toNumber()).to.equal(0);
+                expect(next_totalSupply_AfterReproduce.toNumber()).to.equal(10);
+
+            });
+
+        });
 
 	});
 });
